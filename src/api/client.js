@@ -1,7 +1,8 @@
 import axios from "axios";
+import { API_BASE_URL } from "./env";
 
 const client = axios.create({
-    baseURL: "http://192.168.1.217:4000/api", // 👈 usa seu IP local
+    baseURL: API_BASE_URL,
 });
 
 export default client;

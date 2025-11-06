@@ -9,15 +9,26 @@ import {
     TouchableOpacity,
     View,
 } from "react-native";
-import { useTransactions } from "../store/useTransactions";
+import { useAuthStore } from "../../store/useAuthStore";
+import { useTransactions } from "../../store/useTransactions";
+
+
 
 export default function Home() {
     const { transactions, fetchTransactions } = useTransactions();
     const router = useRouter();
-
+    const { token } = useAuthStore();
     useEffect(() => {
         fetchTransactions();
     }, []);
+
+    useEffect(() => {
+        if (token === null) return; // evita rodar antes do Zustand carregar
+        const timer = setTimeout(() => {
+            if (!token) router.replace("/login");
+        }, 100);
+        return () => clearTimeout(timer);
+    }, [token]);
 
     const totalEntradas = transactions
         .filter((t) => t.type === "entrada")
@@ -28,6 +39,11 @@ export default function Home() {
         .reduce((acc, t) => acc + t.amount, 0);
 
     const saldo = totalEntradas - totalSaidas;
+
+
+
+
+
 
     const renderItem = ({ item }) => (
         <View style={styles.item}>
@@ -112,11 +128,12 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#FFFDFB",
-        paddingHorizontal: 20,
+        paddingHorizontal: 30,
     },
     header: {
         marginTop: 20,
         marginBottom: 10,
+        paddingHorizontal: 10,
     },
     titleHeader: {
         fontSize: 22,
@@ -133,7 +150,7 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
         backgroundColor: "#fff",
         borderRadius: 12,
-        padding: 15,
+        padding: 10,
         marginVertical: 15,
         shadowColor: "#000",
         shadowOpacity: 0.05,
@@ -165,6 +182,7 @@ const styles = StyleSheet.create({
         fontWeight: "600",
         marginBottom: 10,
         color: "#444",
+        marginLeft: 10
     },
     item: {
         backgroundColor: "#fff",
